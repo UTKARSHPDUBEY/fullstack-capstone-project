@@ -21,6 +21,8 @@ connectToDatabase().then(() => {
 
 app.use(express.json());
 
+const giftRoutes= require("./routes/giftRoutes")
+app.use("/api/gifts",giftRoutes)
 // Route files
 // Gift API Task 1: import the giftRoutes and store in a constant called giftroutes
 //{{insert code here}}
