@@ -1,0 +1,13 @@
+.register-card {
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+}
+
+.register-card h2 {
+    font-weight: bold;
+}
+
+.register-card button {
+    margin-top: 10px;
+}
