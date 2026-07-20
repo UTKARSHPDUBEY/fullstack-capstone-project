@@ -45,11 +45,12 @@ body,
 }
 
 .container {
-  padding: 2rem 15%; /* Adds more space on the sides */
+  padding-top: 2rem;
+  padding-bottom: 2rem;
 }
 
 .row {
-  justify-content: space-around; /* Adds space between cards */
+  justify-content: flex-start;
 }
 
 .product-card {
@@ -57,6 +58,7 @@ body,
   border-radius: 10px; /* Rounded corners for card */
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
   overflow: hidden; /* Ensures nothing spills out of the card's rounded corners */
+  
 }
 
 .image-placeholder {
@@ -186,4 +188,19 @@ body,
   background-color: #c82333; /* A darker red on hover/focus for logout */
   color: white;
   text-decoration: none;
+}
+.product-card {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.card-body {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+}
+
+.btn-primary {
+    margin-top: auto;
 }
