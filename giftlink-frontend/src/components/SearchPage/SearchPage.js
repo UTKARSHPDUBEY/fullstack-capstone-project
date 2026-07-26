@@ -5,7 +5,11 @@ import {urlConfig} from '../../config';
 
 function SearchPage() {
 
-    //Task 1: Define state variables for the search query, age range, and search results.
+    const [searchQuery, setSearchQuery] = useState("");
+    const [selectedCategory, setSelectedCategory] = useState("");
+    const [selectedCondition, setSelectedCondition] = useState("");
+    const [ageRange, setAgeRange] = useState(10);
+    const [searchResults, setSearchResults] = useState([]);
     const categories = ['Living', 'Bedroom', 'Bathroom', 'Kitchen', 'Office'];
     const conditions = ['New', 'Like New', 'Older'];
 
@@ -31,12 +35,33 @@ function SearchPage() {
     }, []);
 
 
-    // Task 2. Fetch search results from the API based on user inputs.
+    const handleSearch = async () => {
+        try {
 
+            let url =
+                `${urlConfig.backendUrl}/api/search?` +
+                `name=${searchQuery}` +
+                `&category=${selectedCategory}` +
+                `&condition=${selectedCondition}` +
+                `&age_years=${ageRange}`;
+
+            const response = await fetch(url);
+
+            if (!response.ok) {
+                throw new Error("Search failed");
+            }
+
+            const data = await response.json();
+            setSearchResults(data);
+
+        } catch (error) {
+            console.log(error);
+        }
+    };
     const navigate = useNavigate();
 
     const goToDetailsPage = (productId) => {
-        // Task 6. Enable navigation to the details page of a selected gift.
+        navigate(`/gift/${productId}`);
     };
 
 
@@ -49,13 +74,90 @@ function SearchPage() {
                     <div className="filter-section mb-3 p-3 border rounded">
                         <h5>Filters</h5>
                         <div className="d-flex flex-column">
-                            {/* Task 3: Dynamically generate category and condition dropdown options.*/}
-                            {/* Task 4: Implement an age range slider and display the selected value. */}
+                            <select
+                                className="form-control dropdown-filter mb-2"
+                                value={selectedCategory}
+                                onChange={(e) => setSelectedCategory(e.target.value)}
+                            >
+                                <option value="">All Categories</option>
+                                {categories.map((category) => (
+                                    <option key={category} value={category}>
+                                        {category}
+                                    </option>
+                                ))}
+                            </select>
+                            <select
+                                className="form-control dropdown-filter mb-2"
+                                value={selectedCondition}
+                                onChange={(e) => setSelectedCondition(e.target.value)}
+                            >
+                                <option value="">All Conditions</option>
+                                {conditions.map((condition) => (
+                                    <option key={condition} value={condition}>
+                                        {condition}
+                                    </option>
+                                ))}
+                            </select>
+                            <label>Maximum Age: {ageRange} years</label>
+
+                            <input
+                                type="range"
+                                min="0"
+                                max="20"
+                                value={ageRange}
+                                onChange={(e) => setAgeRange(e.target.value)}
+                                className="form-range age-range-slider"
+                            />
                         </div>
                     </div>
-                    {/* Task 7: Add text input field for search criteria*/}
-                    {/* Task 8: Implement search button with onClick event to trigger search:*/}
-                    {/*Task 5: Display search results and handle empty results with a message. */}
+                    <input
+                        type="text"
+                        className="form-control search-input mb-3"
+                        placeholder="Search by name"
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                    />
+                    <button
+                        className="btn btn-primary search-button mb-3"
+                        onClick={handleSearch}
+                    >
+                        Search
+                    </button>
+                    <>
+                        {searchResults.length === 0 ? (
+                            <div className="alert alert-warning">
+                                No products found.
+                            </div>
+                        ) : (
+                            searchResults.map((gift) => (
+                                <div
+                                    key={gift.id}
+                                    className="card search-results-card mb-3"
+                                >
+                                    {gift.image && (
+                                        <img
+                                            src={gift.image}
+                                            className="card-img-top"
+                                            alt={gift.name}
+                                        />
+                                    )}
+
+                                    <div className="card-body">
+                                        <h5>{gift.name}</h5>
+
+                                        <p>{gift.description}</p>
+
+                                        <button
+                                            className="btn btn-primary"
+                                            onClick={() => goToDetailsPage(gift.id)}
+                                        >
+                                            View Details
+                                        </button>
+                                    </div>
+                                </div>
+                            ))
+                        )}
+                    </>
                 </div>
             </div>
         </div>
