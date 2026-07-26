@@ -1,5 +1,8 @@
 import React, { useState } from 'react';
 import './RegisterPage.css';
+import { urlConfig } from '../../config';
+import { useAppContext } from '../../context/AuthContext';
+import { useNavigate } from 'react-router-dom';
 
 function RegisterPage() {
 
@@ -7,9 +10,40 @@ function RegisterPage() {
     const [lastName, setLastName] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const [errorMessage, setErrorMessage] = useState("");
+    const navigate = useNavigate();
 
-    const handleRegister = () => {
-        console.log("Register button clicked");
+    const {
+        setIsLoggedIn,
+        setUserName
+    } = useAppContext();
+
+    const handleRegister = async () => {
+        try {
+            const response = await fetch(
+                `${urlConfig.backendUrl}/api/auth/register`,
+                {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({firstName,lastName,email,password})
+                }
+            );
+            const data = await response.json();
+            if (response.ok) {
+                sessionStorage.setItem("auth-token", data.authtoken);
+                sessionStorage.setItem("name", firstName);
+                sessionStorage.setItem("email", email);
+                setUserName(firstName);
+                setIsLoggedIn(true);
+                navigate("/app");
+            } else {
+                setErrorMessage(data.error || "Registration failed");
+            }
+        } catch (e) {
+            setErrorMessage("Unable to connect to server.");
+        }
     };
 
     return (
@@ -50,6 +84,12 @@ function RegisterPage() {
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
                             />
+                            {
+                                errorMessage &&
+                                <div className="text-danger mb-3">
+                                    {errorMessage}
+                                </div>
+                            }
                         </div>
 
                         <div className="form-group mb-3">
