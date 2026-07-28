@@ -4,7 +4,7 @@ const bcryptjs = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const dotenv = require('dotenv');
 const pino = require('pino');
-
+const { body, validationResult } = require('express-validator');
 const connectToDatabase = require('../models/db');
 
 const logger = pino();
@@ -132,5 +132,82 @@ router.post('/login', async (req, res) => {
         return res.status(500).send("Internal server error");
 
     }
+});
+router.put(
+    '/update',
+    [
+        body('firstName').notEmpty(),
+        body('lastName').notEmpty()
+    ],
+    async (req, res) => {
+
+    // Task 2
+    const errors = validationResult(req);
+
+    if (!errors.isEmpty()) {
+        return res.status(400).json({
+            errors: errors.array()
+        });
+    }
+
+    try {
+
+        // Task 3
+        const email = req.header("email");
+
+        if (!email) {
+            return res.status(400).json({
+                error: "Email header missing"
+            });
+        }
+
+        // Task 4
+        const db = await connectToDatabase();
+        const users = db.collection("users");
+
+        // Task 5
+        const existingUser = await users.findOne({ email });
+
+        if (!existingUser) {
+            return res.status(404).json({
+                error: "User not found"
+            });
+        }
+
+        existingUser.firstName = req.body.firstName;
+        existingUser.lastName = req.body.lastName;
+
+        if (req.body.password) {
+            const salt = await bcryptjs.genSalt(10);
+            existingUser.password = await bcryptjs.hash(req.body.password, salt);
+        }
+
+        existingUser.updatedAt = new Date();
+
+        // Task 6
+        await users.updateOne(
+            { email },
+            { $set: existingUser }
+        );
+
+        // Task 7
+        const payload = {
+            user: {
+                id: existingUser._id
+            }
+        };
+
+        const authtoken = jwt.sign(payload, JWT_SECRET);
+
+        res.json({ authtoken });
+
+    } catch (e) {
+
+        logger.error(e);
+
+        return res.status(500).send("Internal server error");
+
+    }
+
 });
 module.exports = router;

@@ -1,13 +1,58 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { urlConfig } from '../../config';
+import { useAppContext } from '../../context/AuthContext';
 import './LoginPage.css';
 
 function LoginPage() {
+    const [error, setError] = useState("");
 
+    const navigate = useNavigate();
+    const { setIsLoggedIn, setUserName } = useAppContext();
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
 
-    const handleLogin = () => {
-        console.log("Login button clicked");
+    const handleLogin = async () => {
+
+        try {
+
+            const response = await fetch(`${urlConfig.backendUrl}/api/auth/login`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    email,
+                    password
+                })
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+
+                sessionStorage.setItem("auth-token", data.authtoken);
+                sessionStorage.setItem("email", data.userEmail);
+                sessionStorage.setItem("name", data.userName);
+
+                setUserName(data.userName);
+                setIsLoggedIn(true);
+
+                navigate("/app");
+
+            } else {
+
+                setError(data.error);
+
+            }
+
+        } catch (e) {
+
+            console.log(e);
+            setError("Login failed.");
+
+        }
+
     };
 
     return (
@@ -38,6 +83,11 @@ function LoginPage() {
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
                             />
+                            {error && (
+                                <small className="text-danger">
+                                    {error}
+                                </small>
+                            )}
                         </div>
 
                         <button
