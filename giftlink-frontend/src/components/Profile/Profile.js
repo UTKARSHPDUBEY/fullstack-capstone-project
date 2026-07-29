@@ -63,7 +63,6 @@ const handleSubmit = async (e) => {
       return;
     }
 
-    const payload = { ...updatedDetails };
     const response = await fetch(`${urlConfig.backendUrl}/api/auth/update`, {
       method: "PUT",
       headers: {
