@@ -20,7 +20,7 @@
 "scripts": {
   "start": "react-scripts start",
   "build": "react-scripts build",
-  "postbuild": "powershell -Command \"Copy-Item -Recurse -Force build ../giftwebsite/\"",
+  "postbuild": "cp -r build ../giftwebsite/",
   "test": "react-scripts test",
   "eject": "react-scripts eject"
 },
