@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: giftwebsite-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: giftwebsite
+  template:
+    metadata:
+      labels:
+        app: giftwebsite
+    spec:
+      containers:
+        - name: giftwebsite
+          image: utkarsh4115e/giftwebsite:v1
+          ports:
+            - containerPort: 9000

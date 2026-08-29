@@ -1,0 +1,44 @@
+version: "3.9"
+
+services:
+
+  mongodb:
+    image: mongo:6
+    container_name: mongodb
+    ports:
+      - "27017:27017"
+    networks:
+      - gift-network
+    volumes:
+      - mongodb-data:/data/db
+
+  backend:
+    build:
+      context: ./giftlink-backend
+      dockerfile: Dockerfile
+    container_name: giftlink-backend
+    ports:
+      - "3060:3060"
+    depends_on:
+      - mongodb
+    environment:
+      MONGO_URL: mongodb://mongodb:27017/giftdb
+      JWT_SECRET: setasecret
+    networks:
+      - gift-network
+  frontend:
+    build:
+      context: ./giftlink-frontend
+    container_name: giftlink-frontend
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    networks:
+      - gift-network
+      
+networks:
+  gift-network:
+
+volumes:
+  mongodb-data:

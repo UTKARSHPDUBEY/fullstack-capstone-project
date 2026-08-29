@@ -20,7 +20,8 @@ function DetailsPage() {
         const fetchGift = async () => {
             try {
 				// Task 2: Fetch gift details
-                const response = await fetch(`http://localhost:3060/api/gifts/${productId}`)
+                const API_URL = process.env.REACT_APP_API_URL || "http://localhost:3060";
+                const response = await fetch(`${API_URL}/api/gifts/${productId}`);
                 if (!response.ok) {
                     throw new Error('Network response was not ok');
                 }
